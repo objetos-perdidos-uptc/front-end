@@ -4,6 +4,8 @@ import { Link } from 'react-router-dom'
 import { Button } from '@/shared/components/Button'
 import { ErrorMessage } from '@/shared/components/ErrorMessage'
 import { Input } from '@/shared/components/Input'
+import { Select } from '@/shared/components/Select'
+import { CAMPUSES, UNIVERSITIES } from '@/shared/constants/campuses'
 import { useRegister } from '../hooks/useRegister'
 import { registerSchema, type RegisterInput } from '../schemas'
 
@@ -36,12 +38,30 @@ export function RegisterForm() {
         error={errors.password?.message}
         {...register('password')}
       />
-      <Input label="ID de campus" error={errors.campusId?.message} {...register('campusId')} />
-      <Input
-        label="ID de universidad"
+      <Select
+        label="Campus"
+        placeholder="Selecciona tu campus"
+        error={errors.campusId?.message}
+        {...register('campusId')}
+      >
+        {CAMPUSES.map((c) => (
+          <option key={c.id} value={c.id}>
+            {c.label}
+          </option>
+        ))}
+      </Select>
+      <Select
+        label="Universidad"
+        placeholder="Selecciona tu universidad"
         error={errors.universityId?.message}
         {...register('universityId')}
-      />
+      >
+        {UNIVERSITIES.map((u) => (
+          <option key={u.id} value={u.id}>
+            {u.label}
+          </option>
+        ))}
+      </Select>
       <Button type="submit" loading={isPending}>
         Crear cuenta
       </Button>
