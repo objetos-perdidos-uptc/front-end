@@ -1,76 +1,48 @@
-import { forwardRef, type InputHTMLAttributes, type TextareaHTMLAttributes } from 'react'
+import { forwardRef, type InputHTMLAttributes, type ReactNode } from 'react'
+import { cn } from './cn'
+import { Field, fieldClasses, fieldIds } from './Field'
 
-const fieldClass =
-  'w-full rounded border border-gray-300 bg-white px-3 py-2 text-sm focus:border-brand-500 focus:outline-none'
+export { TextArea } from './TextArea'
 
-interface FieldWrapperProps {
+interface InputProps extends Omit<InputHTMLAttributes<HTMLInputElement>, 'prefix'> {
   label: string
+  hint?: string | undefined
   error?: string | undefined
-  htmlFor: string
-  children: React.ReactNode
-}
-
-function FieldWrapper({ label, error, htmlFor, children }: FieldWrapperProps) {
-  return (
-    <div className="flex flex-col gap-1">
-      <label htmlFor={htmlFor} className="text-sm font-medium text-gray-700">
-        {label}
-      </label>
-      {children}
-      {error && (
-        <p role="alert" className="text-xs text-red-600">
-          {error}
-        </p>
-      )}
-    </div>
-  )
-}
-
-interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
-  label: string
-  error?: string | undefined
+  /** Contenido a la izquierda dentro del campo (p. ej. un icono). */
+  prefix?: ReactNode
+  /** Contenido a la derecha dentro del campo. */
+  suffix?: ReactNode
 }
 
 export const Input = forwardRef<HTMLInputElement, InputProps>(function Input(
-  { label, error, id, name, ...rest },
+  { label, hint, error, prefix, suffix, id, name, required, className, ...rest },
   ref,
 ) {
   const inputId = id ?? name ?? label
-  return (
-    <FieldWrapper label={label} error={error} htmlFor={inputId}>
-      <input
-        ref={ref}
-        id={inputId}
-        name={name}
-        aria-invalid={!!error}
-        className={`${fieldClass} ${error ? 'border-red-500' : ''}`}
-        {...rest}
-      />
-    </FieldWrapper>
-  )
-})
+  const ids = fieldIds(inputId, hint, error)
 
-interface TextAreaProps extends TextareaHTMLAttributes<HTMLTextAreaElement> {
-  label: string
-  error?: string | undefined
-}
-
-export const TextArea = forwardRef<HTMLTextAreaElement, TextAreaProps>(function TextArea(
-  { label, error, id, name, ...rest },
-  ref,
-) {
-  const inputId = id ?? name ?? label
   return (
-    <FieldWrapper label={label} error={error} htmlFor={inputId}>
-      <textarea
-        ref={ref}
-        id={inputId}
-        name={name}
-        rows={4}
-        aria-invalid={!!error}
-        className={`${fieldClass} ${error ? 'border-red-500' : ''}`}
-        {...rest}
-      />
-    </FieldWrapper>
+    <Field id={inputId} label={label} hint={hint} error={error} required={required} ids={ids}>
+      <div className="relative">
+        {prefix && (
+          <span className="pointer-events-none absolute inset-y-0 left-3 flex items-center text-ink-tertiary">
+            {prefix}
+          </span>
+        )}
+        <input
+          ref={ref}
+          id={inputId}
+          name={name}
+          required={required}
+          aria-invalid={!!error}
+          aria-describedby={ids.describedBy}
+          className={fieldClasses(!!error, cn('h-11 px-3', prefix != null && 'pl-10', suffix != null && 'pr-10', className))}
+          {...rest}
+        />
+        {suffix && (
+          <span className="absolute inset-y-0 right-3 flex items-center text-ink-tertiary">{suffix}</span>
+        )}
+      </div>
+    </Field>
   )
 })

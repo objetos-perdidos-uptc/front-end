@@ -1,25 +1,28 @@
+import { Plus } from 'lucide-react'
 import { Link } from 'react-router-dom'
-import { ErrorMessage } from '@/shared/components/ErrorMessage'
-import { Spinner } from '@/shared/components/Spinner'
-import { ClaimList } from '../components/ClaimList'
+import { buttonClasses } from '@/shared/components/Button'
+import { ErrorState } from '@/shared/components/ErrorState'
+import { PageHeader } from '@/shared/components/PageHeader'
+import { ClaimList, ClaimListSkeleton } from '../components/ClaimList'
 import { useMyClaims } from '../hooks/useMyClaims'
 
 export function ClaimsPage() {
-  const { data, isPending, error } = useMyClaims()
+  const { data, isPending, error, refetch, isRefetching } = useMyClaims()
 
   return (
-    <section className="flex flex-col gap-4">
-      <div className="flex items-center justify-between">
-        <h1 className="text-xl font-semibold">Mis reclamos</h1>
-        <Link
-          to="/claims/new"
-          className="rounded bg-brand-600 px-4 py-2 text-sm font-medium text-white hover:bg-brand-700"
-        >
-          Nuevo reclamo
-        </Link>
-      </div>
-      {isPending && <Spinner />}
-      {error && <ErrorMessage message={error.message} />}
+    <section className="flex flex-col gap-8">
+      <PageHeader
+        title="Mis reclamos"
+        subtitle="Objetos que dijiste que son tuyos y en qué va cada solicitud."
+        actions={
+          <Link to="/claims/new" className={buttonClasses()}>
+            <Plus size={20} strokeWidth={1.5} aria-hidden="true" />
+            Nuevo reclamo
+          </Link>
+        }
+      />
+      {isPending && <ClaimListSkeleton />}
+      {error && <ErrorState message={error.message} onRetry={() => void refetch()} retrying={isRefetching} />}
       {data && <ClaimList claims={data} />}
     </section>
   )

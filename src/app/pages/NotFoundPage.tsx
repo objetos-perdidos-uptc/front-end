@@ -1,12 +1,19 @@
+import { Home } from 'lucide-react'
 import { Link } from 'react-router-dom'
+import { buttonClasses } from '@/shared/components/Button'
+import { Logo } from '@/shared/components/Logo'
 
 export function NotFoundPage() {
   return (
-    <main className="mx-auto flex min-h-screen max-w-sm flex-col items-center justify-center gap-3 px-4 text-center">
-      <p className="text-5xl font-bold text-gray-300">404</p>
-      <h1 className="text-lg font-semibold">Página no encontrada</h1>
-      <p className="text-sm text-gray-600">La ruta que buscas no existe.</p>
-      <Link to="/" className="text-sm text-brand-600 hover:underline">
+    <main className="flex min-h-screen flex-col items-center justify-center gap-6 bg-bg px-4 text-center">
+      <Logo size="lg" />
+      <p className="text-6xl font-bold tracking-tight text-ink-tertiary">404</p>
+      <div className="flex flex-col gap-1">
+        <h1 className="text-2xl font-semibold tracking-tight text-ink-primary">Esta página no existe</h1>
+        <p className="text-ink-secondary">Puede que el enlace esté mal o que la página se haya movido.</p>
+      </div>
+      <Link to="/" className={buttonClasses({ size: 'lg' })}>
+        <Home size={20} strokeWidth={1.5} aria-hidden="true" />
         Volver al inicio
       </Link>
     </main>

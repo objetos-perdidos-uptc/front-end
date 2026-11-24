@@ -1,25 +1,28 @@
+import { Plus } from 'lucide-react'
 import { Link } from 'react-router-dom'
-import { ErrorMessage } from '@/shared/components/ErrorMessage'
-import { Spinner } from '@/shared/components/Spinner'
-import { ReportList } from '../components/ReportList'
+import { buttonClasses } from '@/shared/components/Button'
+import { ErrorState } from '@/shared/components/ErrorState'
+import { PageHeader } from '@/shared/components/PageHeader'
+import { ReportList, ReportListSkeleton } from '../components/ReportList'
 import { useMyReports } from '../hooks/useMyReports'
 
 export function ReportsPage() {
-  const { data, isPending, error } = useMyReports()
+  const { data, isPending, error, refetch, isRefetching } = useMyReports()
 
   return (
-    <section className="flex flex-col gap-4">
-      <div className="flex items-center justify-between">
-        <h1 className="text-xl font-semibold">Mis reportes</h1>
-        <Link
-          to="/reports/new"
-          className="rounded bg-brand-600 px-4 py-2 text-sm font-medium text-white hover:bg-brand-700"
-        >
-          Nuevo reporte
-        </Link>
-      </div>
-      {isPending && <Spinner />}
-      {error && <ErrorMessage message={error.message} />}
+    <section className="flex flex-col gap-8">
+      <PageHeader
+        title="Mis reportes"
+        subtitle="Objetos que perdiste o encontraste, con su estado actual."
+        actions={
+          <Link to="/reports/new" className={buttonClasses()}>
+            <Plus size={20} strokeWidth={1.5} aria-hidden="true" />
+            Nuevo reporte
+          </Link>
+        }
+      />
+      {isPending && <ReportListSkeleton />}
+      {error && <ErrorState message={error.message} onRetry={() => void refetch()} retrying={isRefetching} />}
       {data && <ReportList reports={data} />}
     </section>
   )

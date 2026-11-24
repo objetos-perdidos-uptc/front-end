@@ -1,34 +1,48 @@
+import { CheckCircle2, Info, X, XCircle, type LucideIcon } from 'lucide-react'
 import { useToastStore, type ToastKind } from '@/shared/hooks/useToast'
+import { cn } from './cn'
 
-const styles: Record<ToastKind, string> = {
-  info: 'border-gray-300 bg-white text-gray-800',
-  success: 'border-green-300 bg-green-50 text-green-800',
-  error: 'border-red-300 bg-red-50 text-red-800',
+const styles: Record<ToastKind, { border: string; icon: string; Icon: LucideIcon }> = {
+  info: { border: 'border-l-info-text', icon: 'text-info-text', Icon: Info },
+  success: { border: 'border-l-success-text', icon: 'text-success-text', Icon: CheckCircle2 },
+  error: { border: 'border-l-destructive', icon: 'text-destructive', Icon: XCircle },
 }
 
+/** Notificaciones efímeras: arriba a la derecha en desktop, abajo al centro en el celular. */
 export function Toaster() {
   const toasts = useToastStore((state) => state.toasts)
   const dismiss = useToastStore((state) => state.dismiss)
 
   return (
-    <div className="fixed right-4 top-4 z-50 flex w-80 flex-col gap-2" aria-live="polite">
-      {toasts.map((t) => (
-        <div
-          key={t.id}
-          role="status"
-          className={`flex items-start justify-between gap-2 rounded border px-3 py-2 text-sm shadow ${styles[t.kind]}`}
-        >
-          <span>{t.message}</span>
-          <button
-            type="button"
-            onClick={() => dismiss(t.id)}
-            aria-label="Cerrar notificación"
-            className="text-gray-500 hover:text-gray-800"
+    <div
+      aria-live="polite"
+      className="pointer-events-none fixed inset-x-4 bottom-4 z-[60] flex flex-col items-center gap-2 sm:inset-x-auto sm:bottom-auto sm:right-6 sm:top-20 sm:items-end"
+    >
+      {toasts.map((t) => {
+        const { border, icon, Icon } = styles[t.kind]
+        return (
+          <div
+            key={t.id}
+            role={t.kind === 'error' ? 'alert' : 'status'}
+            className={cn(
+              'pointer-events-auto flex w-full max-w-sm items-start gap-3 rounded-md border border-l-4 border-border bg-surface-elevated px-4 py-3 text-sm text-ink-primary shadow-md',
+              'animate-toast-in-up sm:animate-toast-in-right',
+              border,
+            )}
           >
-            ×
-          </button>
-        </div>
-      ))}
+            <Icon size={20} strokeWidth={1.5} aria-hidden="true" className={cn('mt-px shrink-0', icon)} />
+            <p className="flex-1 leading-snug">{t.message}</p>
+            <button
+              type="button"
+              onClick={() => dismiss(t.id)}
+              aria-label="Cerrar notificación"
+              className="-mr-1 rounded-sm p-0.5 text-ink-tertiary transition duration-150 hover:bg-surface-muted hover:text-ink-primary"
+            >
+              <X size={16} strokeWidth={1.5} aria-hidden="true" />
+            </button>
+          </div>
+        )
+      })}
     </div>
   )
 }

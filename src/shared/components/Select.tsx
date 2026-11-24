@@ -1,41 +1,45 @@
+import { ChevronDown } from 'lucide-react'
 import { forwardRef, type SelectHTMLAttributes } from 'react'
-
-const fieldClass =
-    'w-full rounded border border-gray-300 bg-white px-3 py-2 text-sm focus:border-brand-500 focus:outline-none'
+import { Field, fieldClasses, fieldIds } from './Field'
 
 interface SelectProps extends SelectHTMLAttributes<HTMLSelectElement> {
-    label: string
-    error?: string | undefined
-    placeholder?: string
+  label: string
+  hint?: string | undefined
+  error?: string | undefined
+  placeholder?: string
 }
 
+/** Select nativo (accesible y cómodo en el celular) con el estilo de los demás campos. */
 export const Select = forwardRef<HTMLSelectElement, SelectProps>(function Select(
-    { label, error, id, name, placeholder = 'Selecciona una opción', children, ...rest },
-    ref,
+  { label, hint, error, id, name, required, placeholder = 'Selecciona una opción', children, className, ...rest },
+  ref,
 ) {
-    const inputId = id ?? name ?? label
-    return (
-        <div className="flex flex-col gap-1">
-            <label htmlFor={inputId} className="text-sm font-medium text-gray-700">
-                {label}
-            </label>
-            <select
-                ref={ref}
-                id={inputId}
-                name={name}
-                aria-invalid={!!error}
-                aria-describedby={error ? `${inputId}-error` : undefined}
-                className={`${fieldClass} ${error ? 'border-red-500' : ''}`}
-                {...rest}
-            >
-                <option value="">{placeholder}</option>
-                {children}
-            </select>
-            {error && (
-                <p id={`${inputId}-error`} role="alert" className="text-xs text-red-600">
-                    {error}
-                </p>
-            )}
-        </div>
-    )
+  const inputId = id ?? name ?? label
+  const ids = fieldIds(inputId, hint, error)
+
+  return (
+    <Field id={inputId} label={label} hint={hint} error={error} required={required} ids={ids}>
+      <div className="relative">
+        <select
+          ref={ref}
+          id={inputId}
+          name={name}
+          required={required}
+          aria-invalid={!!error}
+          aria-describedby={ids.describedBy}
+          className={fieldClasses(!!error, `h-11 cursor-pointer appearance-none pl-3 pr-10 ${className ?? ''}`)}
+          {...rest}
+        >
+          <option value="">{placeholder}</option>
+          {children}
+        </select>
+        <ChevronDown
+          size={16}
+          strokeWidth={1.5}
+          aria-hidden="true"
+          className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-ink-tertiary"
+        />
+      </div>
+    </Field>
+  )
 })
